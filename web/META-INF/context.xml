@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context docBase="portal_client" path="/portal_client" debug="1" reloadable="true">
+	<!-- User Login Realm -->
+	<Realm resourceName="DirectoryRealmDB"
+		className="org.apache.catalina.realm.JDBCRealm"
+		connectionName="student"
+		connectionPassword="student"
+		connectionURL="jdbc:mysql://localhost/portal_test2"
+		digest="md5"
+		driverName="com.mysql.jdbc.Driver"
+		roleNameCol="Role"
+		userCredCol="Pass"
+		userNameCol="Login"
+		userRoleTable="seq_role"
+		userTable="ent_user"/>
+
+	<!-- Access to Directory DB -->	
+	<Resource name="jdbc/main"
+		auth="Container"
+		type="javax.sql.DataSource" 
+		username="pwd_manager" 
+		password="pwd1234"
+		driverClassName="com.mysql.jdbc.Driver" 
+		url="jdbc:mysql://localhost/portal_test2"
+		maxActive="30" 
+		maxIdle="10"/>
+
+	<!-- Access to Directory DB -->	
+	<Resource name="jdbc/cbum"
+		auth="Container"
+		type="javax.sql.DataSource" 
+		username="pwd_manager" 
+		password="pwd1234"
+		driverClassName="com.mysql.jdbc.Driver" 
+		url="jdbc:mysql://localhost/um2"
+		maxActive="30" 
+		maxIdle="10"/>
+
+</Context>

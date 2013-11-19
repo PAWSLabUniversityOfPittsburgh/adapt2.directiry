@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 2.6//EN"
+        "http://tuckey.org/res/dtds/urlrewrite2.6.dtd">
+
+<!--
+    Configuration file for UrlRewriteFilter
+    http://tuckey.org/urlrewrite/
+-->
+<urlrewrite>
+
+<!--    <rule>
+        <note>Map Server</note>
+		<condition name="host" operator="notequal">localhost</condition>
+        <from>/(.*)</from>
+        <to type="redirect">http://localhost:8080/dir/$1</to>
+    </rule> -->
+    
+
+    	
+ <!--   <rule>
+        <note>Map Server</note> 
+		<condition name="host" operator="notequal">localhost</condition>
+        <from>(.*)/(.*)</from>
+        <to type="redirect">http://localhost:8080/$1/$2</to>
+    </rule> -->
+    
+    <!-- USERS -->
+ 
+	<rule>
+        <note>Map GET requests for accessing RDF user info via login</note>
+		<condition type="method">GET</condition>
+        <from>/rdf/user/myudelson$</from> <!-- ([a-z_A-Z]+[a-z_.A-Z0-9]*) -->
+        <to type="forward">/user?user_login=myudelson&amp;_format=rdf</to> <!-- $1&amp;_format=rdf -->
+    </rule>
+    
+   <rule>
+        <note>Map GET/POST requests for accessing/changing user info via login</note>
+		<condition type="method" next="or">GET</condition>
+		<condition type="method">POST</condition>
+        <from>/user/(?!id/)([a-z_A-Z]+[a-z_.A-Z0-9]*)(\?(.*))?$</from>
+        <to type="forward">/user?user_login=$1&amp;$3</to>
+    </rule>
+
+    <rule>
+        <note>Map GET requests for accessing RDF users info via login</note>
+		<condition type="method">GET</condition>
+        <from>/rdf/users$</from>
+        <to type="forward">/users?_format=rdf</to>
+    </rule>
+
+    <rule>
+        <note>Map GET/POST requests for accessing/changing user info via ID</note>
+		<condition type="method" next="or">GET</condition>
+		<condition type="method">POST</condition>
+        <from>/user/id/([0-9]+)(\?(.*))?$</from>
+        <to type="forward">/user?user_id=$1&amp;$3</to>
+    </rule>
+    
+    <rule>
+        <note>Map GET requests for accessing user EDITOR via ID</note>
+		<condition type="method">GET</condition>
+        <from>/user/id/([0-9]+)/edit</from>
+        <to type="forward">/edit_user?user_id=$1</to>
+    </rule>
+    
+    <rule><!-- %{context-path} -->
+        <note>Map GET requests for accessing user EDITOR via login</note>
+		<condition type="method">GET</condition>
+        <from>/user/(?!id/)([a-z_A-Z]+[a-z_.A-Z0-9]*)/edit</from>
+        <to type="forward">/edit_user?user_login=$1</to>
+    </rule>
+ 
+ 	<!-- GROUPS -->
+    <rule>
+        <note>Map GET requests for accessing RDF group info via login</note>
+		<condition type="method">GET</condition>
+        <from>/rdf/group/([a-z_.A-Z0-9-]+)$</from>
+        <to type="forward">/group?group_mnemonic=$1&amp;_format=rdf</to>
+    </rule>
+
+ 	<rule>
+        <note>Map GET/POST requests for accessing/changing group info via mnemonic</note>
+		<condition type="method" next="or">GET</condition>
+		<condition type="method">POST</condition>
+        <from>/group/(?!id/)([a-z_.A-Z0-9-]+)(\?(.*))?$</from>
+        <to type="forward">/group?group_mnemonic=$1&amp;$3</to>
+    </rule>
+
+    <rule>
+        <note>Map GET requests for accessing RDF group info via login</note>
+		<condition type="method">GET</condition>
+        <from>/rdf/groups$</from>
+        <to type="forward">/groups?_format=rdf</to>
+    </rule>
+
+
+    <rule>
+        <note>Map GET/POST requests for accessing/changing group info via ID</note>
+		<condition type="method" next="or">GET</condition>
+		<condition type="method">POST</condition>
+        <from>/group/id/([0-9]+)(\?(.*))?$</from>
+        <to type="forward">/group?group_id=$1&amp;$3</to>
+    </rule>
+
+    <rule>
+        <note>Map GET requests for accessing group EDITOR via ID</note>
+		<condition type="method">GET</condition>
+        <from>/group/id/([0-9]+)/edit</from>
+        <to type="forward">/edit_group?group_id=$1</to>
+    </rule>
+    
+    <rule><!-- %{context-path} -->
+        <note>Map GET requests for accessing group EDITOR via mnemonic</note>
+		<condition type="method">GET</condition>
+        <from>/group/(?!id/)([a-z_.A-Z0-9-]+)/edit</from>
+        <to type="forward">/edit_group?group_mnemonic=$1</to>
+    </rule>
+    
+    <rule>
+        <note>Map GET/POST requests for adding new user to a group</note>
+		<condition type="method" next="or">GET</condition>
+		<condition type="method">POST</condition>
+        <from>/group/(?!id/)([a-z_.A-Z0-9-]+)/users/new</from>
+        <to type="forward">/user_add?group_mnemonic=$1</to>
+    </rule>
+
+    <rule>
+        <note>Map GET/POST requests for adding new user in general to adding user to a world group</note>
+		<condition type="method" next="or">GET</condition>
+		<condition type="method">POST</condition>
+        <from>/users/new$</from>
+        <to type="forward">/user_add?group_mnemonic=world</to>
+    </rule>
+
+    <rule>
+        <note>Map POST requests of removng user from a group</note>
+		<condition type="method">POST</condition>
+        <from>/group/(?!id/)([a-z_.A-Z0-9-]+)/users/([a-z_A-Z]+[a-z_.A-Z0-9]*)\?_method=delete</from>
+        <to type="forward">/group_user_remove?group_mnemonic=$1&amp;user_login=$2</to>
+    </rule>
+
+     <!--
+
+    INSTALLATION
+
+        in your web.xml add...
+
+        <filter>
+            <filter-name>UrlRewriteFilter</filter-name>
+            <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+            <init-param>
+                <param-name>logLevel</param-name>
+                <param-value>WARN</param-value>
+            </init-param>
+        </filter>
+        <filter-mapping>
+            <filter-name>UrlRewriteFilter</filter-name>
+            <url-pattern>/*</url-pattern>
+        </filter-mapping>
+
+     EXAMPLES
+
+     Redirect one url
+        <rule>
+            <from>/some/old/page.html</from>
+            <to type="redirect">/very/new/page.html</to>
+        </rule>
+
+    Redirect a directory
+        <rule>
+            <from>/some/olddir/(.*)</from>
+            <to type="redirect">/very/newdir/$1</to>
+        </rule>
+
+    Clean a url
+        <rule>
+            <from>/products/([0-9]+)</from>
+            <to>/products/index.jsp?product_id=$1</to>
+        </rule>
+    eg, /products/1234 will be passed on to /products/index.jsp?product_id=1234 without the user noticing.
+
+    Browser detection
+        <rule>
+            <condition name="user-agent">Mozilla/[1-4]</condition>
+            <from>/some/page.html</from>
+            <to>/some/page-for-old-browsers.html</to>
+        </rule>
+    eg, will pass the request for /some/page.html on to /some/page-for-old-browsers.html only for older
+    browsers whose user agent srtings match Mozilla/1, Mozilla/2, Mozilla/3 or Mozilla/4.
+
+    -->
+
+</urlrewrite>
+
